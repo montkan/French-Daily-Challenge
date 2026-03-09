@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Défi Quotidien - A4 打卡表 (雙重保存版)</title>
+    <title>Mon Défi Quotidien - A4 打卡表 (雙重保存修復版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -110,9 +110,10 @@
             border: none;
             border-bottom: 1px solid #f1f5f9;
             width: 100%;
-            padding: 2px 0;
+            padding: 4px 0;
             outline: none;
             background: transparent;
+            display: block;
         }
         .word-input:focus { border-bottom: 1px solid #1768AC; background-color: #f8fafc; }
 
@@ -137,10 +138,10 @@
 
     <div class="no-print max-w-4xl mx-auto mb-6 bg-blue-50 p-4 rounded-lg border border-blue-200 text-blue-800 flex justify-between items-center shadow-sm">
         <div class="flex-1">
-            <p class="font-bold flex items-center">🚀 雙重同步模式：</p>
+            <p class="font-bold flex items-center">🚀 編輯模式：</p>
             <ul class="list-disc ml-5 text-xs mt-1">
-                <li><strong class="text-indigo-700">自動保存</strong>：輸入內容時會即時存於此瀏覽器。</li>
-                <li><strong class="text-indigo-700">雲端備份</strong>：點擊「完成並保存」可將數據永久存於雲端。</li>
+                <li><strong class="text-indigo-700">即時編輯</strong>：直接點擊表格內的空白處即可輸入單詞與例句。</li>
+                <li><strong class="text-indigo-700">自動存檔</strong>：所有輸入會自動保存在您的瀏覽器中。</li>
             </ul>
         </div>
         <div class="flex space-x-2">
@@ -185,13 +186,13 @@
                 <section>
                     <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4 flex justify-between items-center">
                         <span>✍️ 重點單詞 (Mots)</span>
-                        <span class="text-xs font-normal text-gray-400 italic">會自動存檔</span>
+                        <span class="text-xs font-normal text-gray-400 italic">直接點擊輸入</span>
                     </h2>
-                    <table class="w-full text-left">
+                    <table class="w-full text-left table-fixed">
                         <thead>
                             <tr class="text-xs text-gray-400 uppercase">
-                                <th class="pb-2 w-1/2 text-center">單詞與發音</th>
-                                <th class="pb-2 text-center">定義與例句</th>
+                                <th class="pb-2 w-[45%] text-center">單詞與發音</th>
+                                <th class="pb-2 w-[55%] text-center">定義與例句</th>
                             </tr>
                         </thead>
                         <tbody id="words-table-body" class="text-sm">
@@ -295,17 +296,17 @@
         let currentUser = null;
         const LOCAL_STORAGE_KEY = `french_study_cache_${appId}`;
 
-        // 2. 生成表格
+        // 2. 生成表格 (修復：確保 class 為 local-save)
         const tableBody = document.getElementById('words-table-body');
         for(let i=1; i<=10; i++) {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td class="py-2 pr-4 border-b border-gray-100">
+                <td class="py-2 pr-4 border-b border-gray-100 align-top">
                     <input type="text" class="word-input font-bold text-indigo-900 local-save" placeholder="${i}. 單詞" id="word-${i}">
                     <input type="text" class="word-input text-xs text-gray-400 italic local-save" placeholder="/發音/" id="pron-${i}">
                 </td>
-                <td class="py-2 border-b border-gray-100">
-                    <textarea class="word-input text-xs w-full h-10 resize-none local-save" placeholder="定義或例句..." id="def-${i}"></textarea>
+                <td class="py-2 border-b border-gray-100 align-top">
+                    <textarea class="word-input text-xs w-full h-12 resize-none local-save py-1" placeholder="定義或例句..." id="def-${i}"></textarea>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -313,7 +314,6 @@
 
         // --- 本地保存邏輯 ---
 
-        // 收集目前頁面所有數據
         function collectData() {
             const words = {};
             for(let i=1; i<=10; i++) {
@@ -339,13 +339,12 @@
             };
         }
 
-        // 執行本地保存
         function saveToLocal() {
             const data = collectData();
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+            console.log("Local saved");
         }
 
-        // 從本地恢復數據
         function loadFromLocal() {
             const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (!saved) return false;
@@ -353,16 +352,18 @@
             return true;
         }
 
-        // 將對象數據應用到界面
         function applyDataToUI(data) {
             if (!data) return;
             if (data.date) document.getElementById('study-date').value = data.date;
             if (data.words) {
                 for(let i=1; i<=10; i++) {
                     if(data.words[i]) {
-                        document.getElementById(`word-${i}`).value = data.words[i].word || '';
-                        document.getElementById(`pron-${i}`).value = data.words[i].pron || '';
-                        document.getElementById(`def-${i}`).value = data.words[i].def || '';
+                        const w = document.getElementById(`word-${i}`);
+                        const p = document.getElementById(`pron-${i}`);
+                        const d = document.getElementById(`def-${i}`);
+                        if(w) w.value = data.words[i].word || '';
+                        if(p) p.value = data.words[i].pron || '';
+                        if(d) d.value = data.words[i].def || '';
                     }
                 }
             }
@@ -379,7 +380,7 @@
             }
         }
 
-        // 綁定所有輸入事件進行自動保存
+        // 事件委派：確保動態生成的元素也能被監聽
         document.addEventListener('input', (e) => {
             if (e.target.classList.contains('local-save') || 
                 e.target.classList.contains('local-save-cb') || 
@@ -401,7 +402,6 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                // 先加載本地，再嘗試從雲端同步最新的
                 const hasLocal = loadFromLocal();
                 loadFromCloud(hasLocal);
             }
@@ -412,17 +412,19 @@
         async function loadFromCloud(hasLocalData) {
             if (!currentUser) return;
             const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'studyData', 'current');
-            const docSnap = await getDoc(docRef);
+            try {
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const cloudData = docSnap.data();
+                    const localData = hasLocalData ? JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) : null;
 
-            if (docSnap.exists()) {
-                const cloudData = docSnap.data();
-                const localData = hasLocalData ? JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) : null;
-
-                // 簡單衝突解決：如果雲端數據更新，則覆蓋本地
-                if (!localData || (cloudData.updatedAt && new Date(cloudData.updatedAt).getTime() > (localData.timestamp || 0))) {
-                    applyDataToUI(cloudData);
-                    saveToLocal(); // 同步回本地
+                    if (!localData || (cloudData.updatedAt && new Date(cloudData.updatedAt).getTime() > (localData.timestamp || 0))) {
+                        applyDataToUI(cloudData);
+                        saveToLocal();
+                    }
                 }
+            } catch (err) {
+                console.error("Cloud load error:", err);
             }
         }
 
