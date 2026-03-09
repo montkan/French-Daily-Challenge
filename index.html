@@ -1,280 +1,74 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Analyse: Mon Défi Quotidien</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-<style>
-body { font-family: 'Open Sans', sans-serif; background-color: #F8FAFC; color: #1E293B; }
-h1, h2, h3 { font-family: 'Montserrat', sans-serif; }
-.card { background-color: #FFFFFF; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); transition: transform 0.2s; }
-.card:hover { transform: translateY(-2px); }
-.chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
-@media (min-width: 768px) { .chart-container { height: 350px; } }
-.bg-vibrant-navy { background-color: #0A2342; }
-.text-vibrant-navy { color: #0A2342; }
-.bg-vibrant-blue { background-color: #1768AC; }
-.text-vibrant-blue { color: #1768AC; }
-.bg-vibrant-teal { background-color: #2E9CCA; }
-.text-vibrant-teal { color: #2E9CCA; }
-.bg-vibrant-orange { background-color: #FF7B54; }
-.text-vibrant-orange { color: #FF7B54; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Défi Français</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .container { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; width: 100%; }
+        h1 { color: #2c3e50; text-align: center; font-size: 24px; }
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
+        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: #ecf0f1; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; position: relative; }
+        .day.done { background: #2ecc71; color: white; }
+        .day.done::after { content: '✔'; position: absolute; font-size: 10px; bottom: 2px; right: 2px; }
+        .stats { margin-top: 20px; text-align: center; color: #7f8c8d; }
+        button { width: 100%; padding: 10px; margin-top: 20px; border: none; background: #3498db; color: white; border-radius: 5px; cursor: pointer; }
+    </style>
 </head>
-<body class="antialiased pb-20">
+<body>
 
-<!-- Palette: Brilliant Blues & Vibrant Accents (#0A2342, #1768AC, #2E9CCA, #FF7B54) -->
-<!-- Narrative Plan: Hook (Daily Challenge Intro) -> KPI Overview -> Study Time Distribution -> Vocabulary Progression Trend -> Mood Tracking Correlation -> Conclusion. -->
-<!-- Visualization Choices: KPIs -> Big Numbers (Inform); Time Distribution -> Donut Chart (Chart.js, Compare); Vocab Growth -> Line Chart (Chart.js, Change); Mood -> Bar Chart (Chart.js, Compare). NO SVG used. -->
-<!-- EXPLICIT CONFIRMATION: NEITHER Mermaid JS NOR SVG were used anywhere in the output. -->
-
-<nav class="bg-vibrant-navy text-white p-4 sticky top-0 z-50 shadow-md">
-    <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-xl md:text-2xl font-bold tracking-wider">🇫🇷 Mon Défi Quotidien : Tableau de Bord</h1>
-        <span class="text-sm md:text-base opacity-80">Petit à petit, l'oiseau fait son nid.</span>
-    </div>
-</nav>
-
-<main class="container mx-auto px-4 mt-8">
-
-    <section class="mb-12">
-        <h2 class="text-3xl font-bold text-vibrant-navy mb-4 border-b-4 border-vibrant-orange inline-block pb-2">1. Vue d'Ensemble des Objectifs</h2>
-        <p class="text-lg mb-6 leading-relaxed">
-            La clé pour <strong>apprendre</strong> et <strong>réussir</strong> en français réside dans la constance. Cette section présente les indicateurs de performance clés (KPIs) basés sur la "Checklist" quotidienne. En s'engageant chaque jour, ces petits efforts se transforment en une compétence linguistique solide. Voici les fondations de notre défi d'apprentissage.
-        </p>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="card p-6 flex flex-col items-center justify-center text-center border-t-4 border-vibrant-blue">
-                <span class="text-5xl mb-3">🎧</span>
-                <h3 class="text-4xl font-bold text-vibrant-blue mb-2">15 Min</h3>
-                <p class="font-semibold text-gray-600 uppercase tracking-wide">Pratique de l'Écoute</p>
-                <p class="text-sm mt-2 text-gray-500">Immersion auditive quotidienne pour habituer l'oreille.</p>
-            </div>
-            
-            <div class="card p-6 flex flex-col items-center justify-center text-center border-t-4 border-vibrant-teal">
-                <span class="text-5xl mb-3">📝</span>
-                <h3 class="text-4xl font-bold text-vibrant-teal mb-2">10 Mots</h3>
-                <p class="font-semibold text-gray-600 uppercase tracking-wide">Mémorisation</p>
-                <p class="text-sm mt-2 text-gray-500">Enrichissement constant du vocabulaire de base.</p>
-            </div>
-
-            <div class="card p-6 flex flex-col items-center justify-center text-center border-t-4 border-vibrant-orange">
-                <span class="text-5xl mb-3">🗣️</span>
-                <h3 class="text-4xl font-bold text-vibrant-orange mb-2">5 Fois</h3>
-                <p class="font-semibold text-gray-600 uppercase tracking-wide">Exercice de Lecture</p>
-                <p class="text-sm mt-2 text-gray-500">Répétition à voix haute pour la prononciation.</p>
-            </div>
-        </div>
-    </section>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-        <section class="card p-6">
-            <h2 class="text-2xl font-bold text-vibrant-navy mb-3">2. Répartition du Temps d'Étude</h2>
-            <p class="mb-4 text-gray-700">
-                L'organisation est essentielle. Ce graphique en anneau illustre comment une session d'étude standard de 40 minutes est divisée selon les tâches de la checklist. Un équilibre entre la réception (écoute/lecture) et la production (parler/réviser) garantit une rétention optimale.
-            </p>
-            <div class="chart-container">
-                <canvas id="timeDistributionChart"></canvas>
-            </div>
-        </section>
-
-        <section class="card p-6">
-            <h2 class="text-2xl font-bold text-vibrant-navy mb-3">3. Fréquence des Humeurs (30 Jours)</h2>
-            <p class="mb-4 text-gray-700">
-                Apprendre une langue demande du <strong>courage</strong>. Ce graphique à barres compare la fréquence de l'humeur ressentie à la fin des sessions quotidiennes sur un mois. Il est normal de trouver cela difficile parfois, mais le sentiment de satisfaction prédomine généralement avec la persévérance.
-            </p>
-            <div class="chart-container">
-                <canvas id="moodChart"></canvas>
-            </div>
-        </section>
-    </div>
-
-    <section class="card p-6 mb-12">
-        <h2 class="text-2xl font-bold text-vibrant-navy mb-3">4. Progression Cumulée du Vocabulaire</h2>
-        <p class="mb-6 text-gray-700">
-            L'<strong>espoir</strong> fait vivre, mais la pratique fait progresser ! Ce graphique linéaire montre la trajectoire de croissance du vocabulaire sur 30 jours, en comparant l'objectif théorique (10 mots par jour) avec une estimation de rétention réelle (tenant compte de l'oubli naturel humain). La révision constante aide à rapprocher la ligne réelle de l'objectif.
-        </p>
-        <div class="chart-container lg:max-w-4xl">
-            <canvas id="vocabChart"></canvas>
-        </div>
-    </section>
-
-    <section class="bg-vibrant-navy text-white rounded-xl shadow-lg p-8 text-center">
-        <h2 class="text-3xl font-bold mb-4">Le Mot de la Fin</h2>
-        <p class="text-xl italic mb-6">"Chaque pas compte."</p>
-        <p class="max-w-2xl mx-auto leading-relaxed opacity-90">
-            Les données ci-dessus démontrent que la régularité du <strong>Défi Quotidien</strong> transforme des objectifs ambitieux en résultats tangibles. Que vous vous sentiez "Satisfait" ou que la journée soit "Difficile", l'important est de cocher votre checklist. Bon courage pour tes études !
-        </p>
-    </section>
-
-</main>
+<div class="container">
+    <h1 id="title">🇫🇷 法语打卡挑战</h1>
+    <div id="stats" class="stats">本月已坚持: 0 天</div>
+    <div class="grid" id="calendarGrid"></div>
+    <button onclick="resetCalendar()">重置本月记录</button>
+</div>
 
 <script>
-const colors = {
-    navy: '#0A2342',
-    blue: '#1768AC',
-    teal: '#2E9CCA',
-    orange: '#FF7B54',
-    lightGray: '#E2E8F0',
-    darkGray: '#475569'
-};
+    const grid = document.getElementById('calendarGrid');
+    const stats = document.getElementById('stats');
+    const daysInMonth = 31; // 简单起见设为31天
 
-const commonTooltipConfig = {
-    callbacks: {
-        title: function(tooltipItems) {
-            const item = tooltipItems[0];
-            let label = item.chart.data.labels[item.dataIndex];
-            if (Array.isArray(label)) {
-                return label.join(' ');
-            } else {
-                return label;
+    // 从本地存储读取数据
+    let checkInData = JSON.parse(localStorage.getItem('frenchCheckIn')) || [];
+
+    function render() {
+        grid.innerHTML = '';
+        let count = 0;
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.classList.add('day');
+            dayDiv.innerText = i;
+            if (checkInData.includes(i)) {
+                dayDiv.classList.add('done');
+                count++;
             }
+            dayDiv.onclick = () => toggleDay(i);
+            grid.appendChild(dayDiv);
         }
+        stats.innerText = `本月已坚持: ${count} 天`;
+        localStorage.setItem('frenchCheckIn', JSON.stringify(checkInData));
     }
-};
 
-function wrapLabelText(label, limit = 16) {
-    if (label.length <= limit) return label;
-    const words = label.split(' ');
-    let lines = [];
-    let currentLine = words[0];
-    
-    for (let i = 1; i < words.length; i++) {
-        if (currentLine.length + words[i].length + 1 <= limit) {
-            currentLine += ' ' + words[i];
+    function toggleDay(day) {
+        const index = checkInData.indexOf(day);
+        if (index > -1) {
+            checkInData.splice(index, 1);
         } else {
-            lines.push(currentLine);
-            currentLine = words[i];
+            checkInData.push(day);
+        }
+        render();
+    }
+
+    function resetCalendar() {
+        if(confirm('确定要清空本月记录吗？')) {
+            checkInData = [];
+            render();
         }
     }
-    lines.push(currentLine);
-    return lines;
-}
 
-const timeLabels = [
-    "Pratique de l'Écoute Intensive", 
-    "Mémorisation des Nouveaux Mots", 
-    "Exercices de Lecture et Prononciation", 
-    "Révision Générale du Cours"
-].map(l => wrapLabelText(l));
-
-new Chart(document.getElementById('timeDistributionChart'), {
-    type: 'doughnut',
-    data: {
-        labels: timeLabels,
-        datasets: [{
-            data: [15, 10, 5, 10],
-            backgroundColor: [colors.blue, colors.teal, colors.orange, colors.navy],
-            borderWidth: 2,
-            borderColor: '#ffffff'
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { position: 'bottom' },
-            tooltip: commonTooltipConfig
-        },
-        cutout: '65%'
-    }
-});
-
-const moodLabels = [
-    "😊 Satisfait et Accompli", 
-    "😐 Neutre et Normal", 
-    "😫 Difficile mais Nécessaire"
-].map(l => wrapLabelText(l));
-
-new Chart(document.getElementById('moodChart'), {
-    type: 'bar',
-    data: {
-        labels: moodLabels,
-        datasets: [{
-            label: 'Jours par Mois',
-            data: [18, 7, 5],
-            backgroundColor: [colors.teal, colors.blue, colors.orange],
-            borderRadius: 6
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: false },
-            tooltip: commonTooltipConfig
-        },
-        scales: {
-            y: { beginAtZero: true, grid: { color: colors.lightGray } },
-            x: { grid: { display: false } }
-        }
-    }
-});
-
-const days = Array.from({length: 30}, (_, i) => `Jour ${i + 1}`);
-const targetVocab = Array.from({length: 30}, (_, i) => (i + 1) * 10);
-const retainedVocab = targetVocab.map((val, index) => Math.round(val * (0.95 - (index * 0.005)))); 
-
-new Chart(document.getElementById('vocabChart'), {
-    type: 'line',
-    data: {
-        labels: days,
-        datasets: [
-            {
-                label: 'Objectif Théorique (Mots Appris)',
-                data: targetVocab,
-                borderColor: colors.lightGray,
-                borderDash: [5, 5],
-                fill: false,
-                tension: 0.1,
-                pointRadius: 0
-            },
-            {
-                label: 'Mots Réellement Retenus',
-                data: retainedVocab,
-                borderColor: colors.blue,
-                backgroundColor: 'rgba(23, 104, 172, 0.1)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 3,
-                pointBackgroundColor: colors.teal,
-                pointBorderColor: '#fff',
-                pointRadius: 4,
-                pointHoverRadius: 6
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            tooltip: {
-                mode: 'index',
-                intersect: false
-            },
-            legend: { position: 'top' }
-        },
-        scales: {
-            y: { 
-                beginAtZero: true,
-                title: { display: true, text: 'Nombre de Mots' },
-                grid: { color: colors.lightGray }
-            },
-            x: { 
-                grid: { display: false },
-                ticks: { maxTicksLimit: 10 }
-            }
-        },
-        interaction: {
-            mode: 'nearest',
-            axis: 'x',
-            intersect: false
-        }
-    }
-});
+    render();
 </script>
 </body>
 </html>
