@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Défi Quotidien - A4 打卡表 (雙重保存修復版)</title>
+    <title>Mon Défi Quotidien - A4 打卡表 (編輯功能強化版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -55,7 +55,6 @@
             padding-left: 5px;
         }
 
-        /* 自定義打卡框樣式 */
         .cb-container {
             display: block;
             position: relative;
@@ -84,7 +83,6 @@
             border-radius: 4px;
         }
 
-        .cb-container:hover input ~ .checkmark { background-color: #f0f9ff; }
         .cb-container input:checked ~ .checkmark { background-color: #1768AC; }
         .checkmark:after {
             content: "";
@@ -106,16 +104,22 @@
             font-style: italic;
         }
 
+        /* 強化輸入框的可編輯性 */
         .word-input {
             border: none;
             border-bottom: 1px solid #f1f5f9;
             width: 100%;
-            padding: 4px 0;
+            padding: 6px 4px;
             outline: none;
             background: transparent;
             display: block;
+            position: relative;
+            z-index: 10;
         }
-        .word-input:focus { border-bottom: 1px solid #1768AC; background-color: #f8fafc; }
+        .word-input:focus { 
+            border-bottom: 2px solid #1768AC; 
+            background-color: #f8fafc; 
+        }
 
         .mood-btn {
             cursor: pointer;
@@ -128,21 +132,14 @@
             background-color: #fff7ed;
             transform: scale(1.1);
         }
-
-        #save-status {
-            transition: opacity 0.3s;
-        }
     </style>
 </head>
 <body class="p-4">
 
     <div class="no-print max-w-4xl mx-auto mb-6 bg-blue-50 p-4 rounded-lg border border-blue-200 text-blue-800 flex justify-between items-center shadow-sm">
         <div class="flex-1">
-            <p class="font-bold flex items-center">🚀 編輯模式：</p>
-            <ul class="list-disc ml-5 text-xs mt-1">
-                <li><strong class="text-indigo-700">即時編輯</strong>：直接點擊表格內的空白處即可輸入單詞與例句。</li>
-                <li><strong class="text-indigo-700">自動存檔</strong>：所有輸入會自動保存在您的瀏覽器中。</li>
-            </ul>
+            <p class="font-bold flex items-center">📝 編輯提示：</p>
+            <p class="text-xs mt-1 italic text-slate-600">左側單詞表已優化，直接點擊下方藍色字體或虛線處即可開始打字。系統會即時保存。</p>
         </div>
         <div class="flex space-x-2">
             <div id="save-status" class="hidden text-sm bg-green-100 text-green-700 px-3 py-2 rounded-lg items-center border border-green-200">
@@ -164,7 +161,7 @@
         <div class="flex justify-between items-end mb-8">
             <div>
                 <h1 class="header-title text-4xl uppercase tracking-tighter">Mon Défi Quotidien</h1>
-                <p class="text-vibrant-blue font-bold tracking-widest mt-1 text-indigo-800">法語每日單詞打卡表</p>
+                <p class="font-bold tracking-widest mt-1 text-indigo-800">法語每日單詞打卡表</p>
             </div>
             <div class="text-right w-48">
                 <div class="flex items-center mb-2">
@@ -184,100 +181,86 @@
             <!-- 左側：單詞區 -->
             <div class="space-y-6">
                 <section>
-                    <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4 flex justify-between items-center">
-                        <span>✍️ 重點單詞 (Mots)</span>
-                        <span class="text-xs font-normal text-gray-400 italic">直接點擊輸入</span>
+                    <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4">
+                        ✍️ 重點單詞 (Mots)
                     </h2>
                     <table class="w-full text-left table-fixed">
                         <thead>
                             <tr class="text-xs text-gray-400 uppercase">
-                                <th class="pb-2 w-[45%] text-center">單詞與發音</th>
-                                <th class="pb-2 w-[55%] text-center">定義與例句</th>
+                                <th class="pb-2 w-[45%]">單詞與發音</th>
+                                <th class="pb-2 w-[55%]">定義與例句</th>
                             </tr>
                         </thead>
                         <tbody id="words-table-body" class="text-sm">
-                            <!-- 由 JS 動態生成 -->
+                            <!-- JS 動態生成 -->
                         </tbody>
                     </table>
                 </section>
             </div>
 
-            <!-- 右側：任務與筆記區 -->
+            <!-- 右側：任務區 -->
             <div class="space-y-8">
-                <!-- 打卡清單 -->
                 <section>
-                    <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4">✅ 今日任務 (Checklist)</h2>
+                    <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4">✅ 今日任務</h2>
                     <div id="checklist-container" class="space-y-4 pt-2">
                         <label class="cb-container">
-                            <span class="text-gray-700">聽力練習 (15 分鐘)</span>
+                            <span class="text-gray-700 text-sm">聽力練習 (15 分鐘)</span>
                             <input type="checkbox" data-task="listening" class="local-save-cb">
                             <span class="checkmark"></span>
                         </label>
                         <label class="cb-container">
-                            <span class="text-gray-700">單詞背誦 (10 個)</span>
+                            <span class="text-gray-700 text-sm">單詞背誦 (10 個)</span>
                             <input type="checkbox" data-task="vocab" class="local-save-cb">
                             <span class="checkmark"></span>
                         </label>
                         <label class="cb-container">
-                            <span class="text-gray-700">朗讀練習 (5 遍)</span>
+                            <span class="text-gray-700 text-sm">朗讀練習 (5 遍)</span>
                             <input type="checkbox" data-task="reading" class="local-save-cb">
                             <span class="checkmark"></span>
                         </label>
                         <label class="cb-container">
-                            <span class="text-gray-700">課後複習與總結</span>
+                            <span class="text-gray-700 text-sm">課後複習與總結</span>
                             <input type="checkbox" data-task="review" class="local-save-cb">
                             <span class="checkmark"></span>
                         </label>
                     </div>
                 </section>
 
-                <!-- 語法筆記區 -->
                 <section>
-                    <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4">📖 語法筆記 (Grammaire)</h2>
-                    <textarea id="grammar-notes" class="w-full h-40 border border-dashed border-gray-300 rounded p-4 text-sm focus:outline-none focus:border-indigo-500 transition local-save" placeholder="在此輸入今日學到的新句型或變位..."></textarea>
+                    <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4">📖 語法筆記</h2>
+                    <textarea id="grammar-notes" class="w-full h-44 border border-dashed border-gray-300 rounded p-4 text-sm focus:outline-none focus:border-indigo-500 transition local-save" placeholder="在此輸入今日學到的新句型..."></textarea>
                 </section>
 
-                <!-- 今日心情 -->
                 <section>
-                    <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4">🌟 今日心情 (Humeur)</h2>
+                    <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4">🌟 今日心情</h2>
                     <div id="mood-selector" class="flex justify-around py-2">
                         <label class="text-center mood-btn">
                             <input type="radio" name="mood" value="happy" class="mood-checkbox local-save-radio">
-                            <div class="mood-label w-12 h-12 border-2 border-gray-100 rounded-full flex items-center justify-center text-2xl mb-1 cursor-pointer hover:border-orange-200">😊</div>
-                            <span class="text-xs">Satisfait</span>
+                            <div class="mood-label w-12 h-12 border-2 border-gray-100 rounded-full flex items-center justify-center text-2xl mb-1 cursor-pointer">😊</div>
+                            <span class="text-[10px]">Satisfait</span>
                         </label>
                         <label class="text-center mood-btn">
                             <input type="radio" name="mood" value="normal" class="mood-checkbox local-save-radio">
-                            <div class="mood-label w-12 h-12 border-2 border-gray-100 rounded-full flex items-center justify-center text-2xl mb-1 cursor-pointer hover:border-orange-200">😐</div>
-                            <span class="text-xs">Normal</span>
+                            <div class="mood-label w-12 h-12 border-2 border-gray-100 rounded-full flex items-center justify-center text-2xl mb-1 cursor-pointer">😐</div>
+                            <span class="text-[10px]">Normal</span>
                         </label>
                         <label class="text-center mood-btn">
                             <input type="radio" name="mood" value="sad" class="mood-checkbox local-save-radio">
-                            <div class="mood-label w-12 h-12 border-2 border-gray-100 rounded-full flex items-center justify-center text-2xl mb-1 cursor-pointer hover:border-orange-200">😫</div>
-                            <span class="text-xs">Difficile</span>
+                            <div class="mood-label w-12 h-12 border-2 border-gray-100 rounded-full flex items-center justify-center text-2xl mb-1 cursor-pointer">😫</div>
+                            <span class="text-[10px]">Difficile</span>
                         </label>
                     </div>
                 </section>
             </div>
         </div>
 
-        <!-- 頁尾 -->
-        <div class="mt-auto pt-6 border-t border-gray-100 flex justify-between items-center">
-            <p class="text-[10px] text-gray-400">© 2024 Mon Défi Quotidien | 雲端與本地同步系統</p>
+        <div class="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center text-[10px] text-gray-400">
+            <p>© 2024 Mon Défi Quotidien | 自動備份已啟動</p>
             <div class="flex space-x-2">
                 <div class="w-3 h-3 bg-indigo-900"></div>
                 <div class="w-3 h-3 bg-indigo-600"></div>
                 <div class="w-3 h-3 bg-orange-400"></div>
             </div>
-        </div>
-
-        <!-- 裝飾元素 -->
-        <div class="absolute bottom-16 right-6 opacity-[0.05] pointer-events-none">
-            <svg width="80" height="200" viewBox="0 0 100 250">
-                <path d="M50,10 L45,40 L55,40 Z" fill="#0A2342"/>
-                <path d="M45,40 L40,100 L60,100 L55,40 Z" fill="#0A2342"/>
-                <path d="M40,100 L20,240 L80,240 L60,100 Z" fill="none" stroke="#0A2342" stroke-width="4"/>
-            </svg>
         </div>
     </div>
 
@@ -286,7 +269,6 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // 1. 初始化 Firebase
         const firebaseConfig = JSON.parse(__firebase_config);
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -294,103 +276,84 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'french-study-tracker';
 
         let currentUser = null;
-        const LOCAL_STORAGE_KEY = `french_study_cache_${appId}`;
+        const LOCAL_KEY = `fr_cache_${appId}`;
 
-        // 2. 生成表格 (修復：確保 class 為 local-save)
+        // 動態生成表格
         const tableBody = document.getElementById('words-table-body');
         for(let i=1; i<=10; i++) {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td class="py-2 pr-4 border-b border-gray-100 align-top">
+                <td class="py-2 pr-3 border-b border-gray-100 align-top">
                     <input type="text" class="word-input font-bold text-indigo-900 local-save" placeholder="${i}. 單詞" id="word-${i}">
                     <input type="text" class="word-input text-xs text-gray-400 italic local-save" placeholder="/發音/" id="pron-${i}">
                 </td>
                 <td class="py-2 border-b border-gray-100 align-top">
-                    <textarea class="word-input text-xs w-full h-12 resize-none local-save py-1" placeholder="定義或例句..." id="def-${i}"></textarea>
+                    <textarea class="word-input text-xs w-full h-14 local-save overflow-hidden" placeholder="定義或例句..." id="def-${i}"></textarea>
                 </td>
             `;
             tableBody.appendChild(row);
         }
 
-        // --- 本地保存邏輯 ---
-
         function collectData() {
-            const words = {};
-            for(let i=1; i<=10; i++) {
-                words[i] = {
-                    word: document.getElementById(`word-${i}`).value,
-                    pron: document.getElementById(`pron-${i}`).value,
-                    def: document.getElementById(`def-${i}`).value
-                };
-            }
-            const checklist = {};
-            document.querySelectorAll('input[data-task]').forEach(cb => {
-                checklist[cb.getAttribute('data-task')] = cb.checked;
-            });
-            const moodValue = document.querySelector('input[name="mood"]:checked')?.value || null;
-            
-            return {
+            const data = {
                 date: document.getElementById('study-date').value,
-                words: words,
-                checklist: checklist,
+                words: {},
+                checklist: {},
                 notes: document.getElementById('grammar-notes').value,
-                mood: moodValue,
+                mood: document.querySelector('input[name="mood"]:checked')?.value || null,
                 timestamp: Date.now()
             };
+            for(let i=1; i<=10; i++) {
+                data.words[i] = {
+                    w: document.getElementById(`word-${i}`).value,
+                    p: document.getElementById(`pron-${i}`).value,
+                    d: document.getElementById(`def-${i}`).value
+                };
+            }
+            document.querySelectorAll('input[data-task]').forEach(cb => {
+                data.checklist[cb.getAttribute('data-task')] = cb.checked;
+            });
+            return data;
         }
 
         function saveToLocal() {
-            const data = collectData();
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-            console.log("Local saved");
+            localStorage.setItem(LOCAL_KEY, JSON.stringify(collectData()));
         }
 
-        function loadFromLocal() {
-            const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (!saved) return false;
-            applyDataToUI(JSON.parse(saved));
-            return true;
-        }
-
-        function applyDataToUI(data) {
+        function applyData(data) {
             if (!data) return;
             if (data.date) document.getElementById('study-date').value = data.date;
             if (data.words) {
                 for(let i=1; i<=10; i++) {
-                    if(data.words[i]) {
-                        const w = document.getElementById(`word-${i}`);
-                        const p = document.getElementById(`pron-${i}`);
-                        const d = document.getElementById(`def-${i}`);
-                        if(w) w.value = data.words[i].word || '';
-                        if(p) p.value = data.words[i].pron || '';
-                        if(d) d.value = data.words[i].def || '';
+                    const item = data.words[i];
+                    if (item) {
+                        document.getElementById(`word-${i}`).value = item.w || '';
+                        document.getElementById(`pron-${i}`).value = item.p || '';
+                        document.getElementById(`def-${i}`).value = item.d || '';
                     }
                 }
             }
             if (data.checklist) {
-                Object.keys(data.checklist).forEach(key => {
-                    const cb = document.querySelector(`input[data-task="${key}"]`);
-                    if(cb) cb.checked = data.checklist[key];
+                Object.keys(data.checklist).forEach(k => {
+                    const el = document.querySelector(`input[data-task="${k}"]`);
+                    if(el) el.checked = data.checklist[k];
                 });
             }
             if (data.notes) document.getElementById('grammar-notes').value = data.notes;
             if (data.mood) {
-                const moodRadio = document.querySelector(`input[name="mood"][value="${data.mood}"]`);
-                if(moodRadio) moodRadio.checked = true;
+                const rb = document.querySelector(`input[name="mood"][value="${data.mood}"]`);
+                if(rb) rb.checked = true;
             }
         }
 
-        // 事件委派：確保動態生成的元素也能被監聽
-        document.addEventListener('input', (e) => {
-            if (e.target.classList.contains('local-save') || 
-                e.target.classList.contains('local-save-cb') || 
-                e.target.classList.contains('local-save-radio')) {
+        // 監聽所有輸入
+        document.body.addEventListener('input', (e) => {
+            if (e.target.classList.contains('local-save') || e.target.closest('.local-save-cb') || e.target.name === 'mood') {
                 saveToLocal();
             }
         });
 
-        // --- Firebase 雲端邏輯 ---
-
+        // Firebase Auth
         const initAuth = async () => {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 await signInWithCustomToken(auth, __initial_auth_token);
@@ -399,67 +362,41 @@
             }
         };
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                const hasLocal = loadFromLocal();
-                loadFromCloud(hasLocal);
-            }
-        });
-
-        initAuth();
-
-        async function loadFromCloud(hasLocalData) {
-            if (!currentUser) return;
-            const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'studyData', 'current');
-            try {
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const cloudData = docSnap.data();
-                    const localData = hasLocalData ? JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) : null;
-
-                    if (!localData || (cloudData.updatedAt && new Date(cloudData.updatedAt).getTime() > (localData.timestamp || 0))) {
-                        applyDataToUI(cloudData);
+                const local = localStorage.getItem(LOCAL_KEY);
+                if (local) applyData(JSON.parse(local));
+                
+                // 雲端同步
+                const snap = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'current'));
+                if (snap.exists()) {
+                    const cloud = snap.data();
+                    const localTime = local ? JSON.parse(local).timestamp : 0;
+                    if (cloud.timestamp > localTime) {
+                        applyData(cloud);
                         saveToLocal();
                     }
                 }
-            } catch (err) {
-                console.error("Cloud load error:", err);
             }
-        }
+        });
+        initAuth();
 
+        // 雲端保存按鈕
         const saveBtn = document.getElementById('save-btn');
-        const saveStatus = document.getElementById('save-status');
-        const saveText = document.getElementById('save-text');
-
         saveBtn.addEventListener('click', async () => {
             if (!currentUser) return;
-
             saveBtn.disabled = true;
-            saveText.innerText = "⏳ 正在備份至雲端...";
-
-            const data = collectData();
-            const payload = {
-                ...data,
-                updatedAt: new Date().toISOString()
-            };
-
+            document.getElementById('save-text').innerText = "正在保存...";
+            
             try {
-                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'studyData', 'current'), payload);
-                saveToLocal();
-                
-                saveStatus.classList.remove('hidden');
-                saveStatus.classList.add('flex');
-                setTimeout(() => {
-                    saveStatus.classList.add('hidden');
-                    saveStatus.classList.remove('flex');
-                }, 3000);
-            } catch (e) {
-                console.error("Save error", e);
-            } finally {
-                saveBtn.disabled = false;
-                saveText.innerText = "💾 完成並保存進度";
-            }
+                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'current'), collectData());
+                document.getElementById('save-status').classList.remove('hidden');
+                setTimeout(() => document.getElementById('save-status').classList.add('hidden'), 3000);
+            } catch (e) { console.error(e); }
+            
+            saveBtn.disabled = false;
+            document.getElementById('save-text').innerText = "💾 完成並保存進度";
         });
     </script>
 </body>
