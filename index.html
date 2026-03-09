@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Défi Quotidien - A4 打卡表 (編輯功能強化版)</title>
+    <title>Mon Défi Quotidien - A4 打卡表 (編輯功能修復版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -109,15 +109,15 @@
             border: none;
             border-bottom: 1px solid #f1f5f9;
             width: 100%;
-            padding: 6px 4px;
+            padding: 4px 2px;
             outline: none;
             background: transparent;
             display: block;
-            position: relative;
-            z-index: 10;
+            font-size: 13px;
+            transition: all 0.2s;
         }
         .word-input:focus { 
-            border-bottom: 2px solid #1768AC; 
+            border-bottom: 1.5px solid #1768AC; 
             background-color: #f8fafc; 
         }
 
@@ -138,8 +138,8 @@
 
     <div class="no-print max-w-4xl mx-auto mb-6 bg-blue-50 p-4 rounded-lg border border-blue-200 text-blue-800 flex justify-between items-center shadow-sm">
         <div class="flex-1">
-            <p class="font-bold flex items-center">📝 編輯提示：</p>
-            <p class="text-xs mt-1 italic text-slate-600">左側單詞表已優化，直接點擊下方藍色字體或虛線處即可開始打字。系統會即時保存。</p>
+            <p class="font-bold flex items-center">📝 編輯模式已修復：</p>
+            <p class="text-xs mt-1 italic text-slate-600">已取消動態生成，現在下方單詞列表可直接點擊進行編輯。修改後會自動保存到瀏覽器。</p>
         </div>
         <div class="flex space-x-2">
             <div id="save-status" class="hidden text-sm bg-green-100 text-green-700 px-3 py-2 rounded-lg items-center border border-green-200">
@@ -181,18 +181,35 @@
             <!-- 左側：單詞區 -->
             <div class="space-y-6">
                 <section>
-                    <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4">
-                        ✍️ 重點單詞 (Mots)
+                    <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4 flex justify-between items-center">
+                        <span>✍️ 重點單詞 (Mots)</span>
+                        <span class="text-[10px] font-normal text-gray-400 italic uppercase">Cliquer pour éditer</span>
                     </h2>
-                    <table class="w-full text-left table-fixed">
+                    <table class="w-full text-left">
                         <thead>
-                            <tr class="text-xs text-gray-400 uppercase">
-                                <th class="pb-2 w-[45%]">單詞與發音</th>
-                                <th class="pb-2 w-[55%]">定義與例句</th>
+                            <tr class="text-[10px] text-gray-400 uppercase">
+                                <th class="pb-2 w-2/5">單詞與發音</th>
+                                <th class="pb-2 w-3/5">定義與例句</th>
                             </tr>
                         </thead>
                         <tbody id="words-table-body" class="text-sm">
-                            <!-- JS 動態生成 -->
+                            <!-- 靜態生成 10 列 -->
+                            <script>
+                                // 為了確保穩定性，我們在這裡直接輸出 HTML
+                                for(let i=1; i<=10; i++) {
+                                    document.write(`
+                                        <tr>
+                                            <td class="py-2 pr-3 border-b border-gray-100 align-top">
+                                                <input type="text" class="word-input font-bold text-indigo-900 local-save" placeholder="${i}. 單詞" id="word-${i}">
+                                                <input type="text" class="word-input text-[11px] text-gray-400 italic local-save" placeholder="/發音/" id="pron-${i}">
+                                            </td>
+                                            <td class="py-2 border-b border-gray-100 align-top">
+                                                <textarea class="word-input text-[11px] w-full h-12 local-save overflow-hidden py-1 leading-tight" placeholder="定義或例句..." id="def-${i}"></textarea>
+                                            </td>
+                                        </tr>
+                                    `);
+                                }
+                            </script>
                         </tbody>
                     </table>
                 </section>
@@ -255,7 +272,7 @@
         </div>
 
         <div class="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center text-[10px] text-gray-400">
-            <p>© 2024 Mon Défi Quotidien | 自動備份已啟動</p>
+            <p>© 2024 Mon Défi Quotidien | 編輯功能修復完成</p>
             <div class="flex space-x-2">
                 <div class="w-3 h-3 bg-indigo-900"></div>
                 <div class="w-3 h-3 bg-indigo-600"></div>
@@ -278,22 +295,6 @@
         let currentUser = null;
         const LOCAL_KEY = `fr_cache_${appId}`;
 
-        // 動態生成表格
-        const tableBody = document.getElementById('words-table-body');
-        for(let i=1; i<=10; i++) {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="py-2 pr-3 border-b border-gray-100 align-top">
-                    <input type="text" class="word-input font-bold text-indigo-900 local-save" placeholder="${i}. 單詞" id="word-${i}">
-                    <input type="text" class="word-input text-xs text-gray-400 italic local-save" placeholder="/發音/" id="pron-${i}">
-                </td>
-                <td class="py-2 border-b border-gray-100 align-top">
-                    <textarea class="word-input text-xs w-full h-14 local-save overflow-hidden" placeholder="定義或例句..." id="def-${i}"></textarea>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        }
-
         function collectData() {
             const data = {
                 date: document.getElementById('study-date').value,
@@ -304,10 +305,13 @@
                 timestamp: Date.now()
             };
             for(let i=1; i<=10; i++) {
+                const w = document.getElementById(`word-${i}`);
+                const p = document.getElementById(`pron-${i}`);
+                const d = document.getElementById(`def-${i}`);
                 data.words[i] = {
-                    w: document.getElementById(`word-${i}`).value,
-                    p: document.getElementById(`pron-${i}`).value,
-                    d: document.getElementById(`def-${i}`).value
+                    w: w ? w.value : '',
+                    p: p ? p.value : '',
+                    d: d ? d.value : ''
                 };
             }
             document.querySelectorAll('input[data-task]').forEach(cb => {
@@ -318,6 +322,7 @@
 
         function saveToLocal() {
             localStorage.setItem(LOCAL_KEY, JSON.stringify(collectData()));
+            console.log("Auto-saved to local storage");
         }
 
         function applyData(data) {
@@ -327,9 +332,12 @@
                 for(let i=1; i<=10; i++) {
                     const item = data.words[i];
                     if (item) {
-                        document.getElementById(`word-${i}`).value = item.w || '';
-                        document.getElementById(`pron-${i}`).value = item.p || '';
-                        document.getElementById(`def-${i}`).value = item.d || '';
+                        const w = document.getElementById(`word-${i}`);
+                        const p = document.getElementById(`pron-${i}`);
+                        const d = document.getElementById(`def-${i}`);
+                        if(w) w.value = item.w || '';
+                        if(p) p.value = item.p || '';
+                        if(d) d.value = item.d || '';
                     }
                 }
             }
@@ -346,14 +354,14 @@
             }
         }
 
-        // 監聽所有輸入
+        // 監聽全局輸入以便自動保存
         document.body.addEventListener('input', (e) => {
-            if (e.target.classList.contains('local-save') || e.target.closest('.local-save-cb') || e.target.name === 'mood') {
+            if (e.target.classList.contains('local-save') || e.target.classList.contains('local-save-cb') || e.target.name === 'mood') {
                 saveToLocal();
             }
         });
 
-        // Firebase Auth
+        // Firebase 認證與加載
         const initAuth = async () => {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 await signInWithCustomToken(auth, __initial_auth_token);
@@ -368,32 +376,37 @@
                 const local = localStorage.getItem(LOCAL_KEY);
                 if (local) applyData(JSON.parse(local));
                 
-                // 雲端同步
-                const snap = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'current'));
-                if (snap.exists()) {
-                    const cloud = snap.data();
-                    const localTime = local ? JSON.parse(local).timestamp : 0;
-                    if (cloud.timestamp > localTime) {
-                        applyData(cloud);
-                        saveToLocal();
+                try {
+                    const snap = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'current'));
+                    if (snap.exists()) {
+                        const cloud = snap.data();
+                        const localTime = local ? JSON.parse(local).timestamp : 0;
+                        if (cloud.timestamp > localTime) {
+                            applyData(cloud);
+                            saveToLocal();
+                        }
                     }
-                }
+                } catch (err) { console.error("Cloud load fail:", err); }
             }
         });
         initAuth();
 
-        // 雲端保存按鈕
+        // 雲端備份按鈕
         const saveBtn = document.getElementById('save-btn');
         saveBtn.addEventListener('click', async () => {
             if (!currentUser) return;
             saveBtn.disabled = true;
-            document.getElementById('save-text').innerText = "正在保存...";
+            document.getElementById('save-text').innerText = "⏳ 正在同步...";
             
             try {
                 await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'current'), collectData());
                 document.getElementById('save-status').classList.remove('hidden');
-                setTimeout(() => document.getElementById('save-status').classList.add('hidden'), 3000);
-            } catch (e) { console.error(e); }
+                document.getElementById('save-status').classList.add('flex');
+                setTimeout(() => {
+                    document.getElementById('save-status').classList.add('hidden');
+                    document.getElementById('save-status').classList.remove('flex');
+                }, 3000);
+            } catch (e) { console.error("Sync fail", e); }
             
             saveBtn.disabled = false;
             document.getElementById('save-text').innerText = "💾 完成並保存進度";
