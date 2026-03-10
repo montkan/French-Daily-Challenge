@@ -149,22 +149,22 @@
             </div>
             <div class="h-10 w-[1px] bg-gray-700"></div>
             <div class="text-center">
-                <p class="text-gray-400 text-xs uppercase tracking-widest mb-1">當前查看日期</p>
-                <input type="date" id="date-picker" class="bg-transparent border-b border-gray-500 font-bold text-lg focus:outline-none">
+                <p class="text-gray-400 text-xs uppercase tracking-widest mb-1">選擇日期 (查看/修改)</p>
+                <input type="date" id="date-picker" class="bg-transparent border-b border-gray-500 font-bold text-lg focus:outline-none cursor-pointer">
             </div>
         </div>
 
         <div class="bg-white p-4 rounded-lg border border-slate-200 flex justify-between items-center shadow-sm">
             <div class="flex-1">
-                <p class="font-bold text-slate-800">本地存儲模式已啟動 💾</p>
-                <p class="text-xs text-slate-500">所有紀錄將保存在您的瀏覽器中，無需聯網即可保存與查看歷史。</p>
+                <p class="font-bold text-slate-800">編輯模式 ✏️</p>
+                <p class="text-xs text-slate-500">切換日期後直接修改內容，再次點擊保存按鈕即可更新該日紀錄。</p>
             </div>
             <div class="flex space-x-2">
                 <div id="save-status" class="hidden text-sm bg-green-100 text-green-700 px-3 py-2 rounded-lg items-center border border-green-200 animate-bounce">
-                    ✅ 紀錄已存至本地
+                    ✅ 紀錄已成功更新
                 </div>
                 <button id="save-btn" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold hover:bg-indigo-700 transition shadow-md">
-                    <span>💾 保存今日紀錄</span>
+                    <span>💾 保存/更新紀錄</span>
                 </button>
                 <button onclick="window.print()" class="bg-slate-800 text-white px-5 py-2 rounded-lg font-bold hover:bg-slate-900 transition shadow-md">
                     🖨️ 列印 A4 存檔
@@ -307,7 +307,7 @@
             return data ? JSON.parse(data) : {};
         }
 
-        // 保存目前頁面到 LocalStorage
+        // 保存目前頁面到 LocalStorage (包含修改現有紀錄)
         function saveToLocal() {
             const records = getAllRecords();
             const currentData = {
@@ -330,6 +330,7 @@
                 currentData.checklist[cb.getAttribute('data-task')] = cb.checked;
             });
 
+            // 將當前內容保存至選定的日期（若已存在則覆蓋，達成修改效果）
             records[selectedDate] = currentData;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
             
@@ -342,7 +343,7 @@
             const records = getAllRecords();
             const data = records[dateStr];
 
-            // 重置表單
+            // 重置表單為空值或預設
             document.getElementById('grammar-notes').value = data?.notes || '';
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
             document.querySelectorAll('input[name="mood"]').forEach(rb => rb.checked = false);
@@ -352,7 +353,7 @@
                 document.getElementById(`def-${i}`).value = data?.words?.[i]?.d || '';
             }
 
-            // 填充
+            // 如果該日期有紀錄，則填充
             if (data?.checklist) {
                 Object.keys(data.checklist).forEach(k => {
                     const el = document.querySelector(`input[data-task="${k}"]`);
