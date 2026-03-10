@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mon Défi Quotidien - 法語學習本地進度管理</title>
+    <title>Mon Défi Quotidien - Apprentissage du Français</title>
     
-    <!-- PWA 與 行動裝置優化 -->
+    <!-- PWA & Mobile Optimization -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="法語打卡">
+    <meta name="apple-mobile-web-app-title" content="Mon Défi">
+    <meta name="application-name" content="Mon Défi">
     <meta name="theme-color" content="#1e293b">
+    
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/197/197/197560.png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/197/197/197560.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         @media print {
             body { background: white; padding: 0; margin: 0; }
@@ -23,7 +27,7 @@
                 margin: 0 !important;
                 width: 210mm;
                 height: 297mm;
-                padding: 15mm !important;
+                padding: 12mm !important;
                 border: none !important;
             }
             input[type="text"], textarea { border: none !important; background: transparent !important; }
@@ -32,9 +36,8 @@
         
         body {
             background-color: #f1f5f9;
-            font-family: 'Noto Sans TC', sans-serif;
+            font-family: 'Montserrat', 'Noto Sans', sans-serif;
             -webkit-print-color-adjust: exact;
-            /* 防止行動裝置橡皮筋回彈效果 */
             overscroll-behavior-y: contain;
         }
 
@@ -43,7 +46,7 @@
             width: 210mm;
             height: 297mm;
             margin: 20px auto;
-            padding: 20mm;
+            padding: 15mm;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
@@ -52,7 +55,6 @@
             overflow: hidden;
         }
 
-        /* 行動裝置適應 */
         @media (max-width: 210mm) {
             .page-container {
                 width: 100%;
@@ -63,16 +65,13 @@
             }
         }
 
-        .header-title {
-            font-family: 'Montserrat', sans-serif;
-            color: #0A2342;
-        }
+        .header-title { color: #0A2342; }
 
         .cb-container {
             display: block;
             position: relative;
             padding-left: 35px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             cursor: pointer;
             user-select: none;
         }
@@ -89,8 +88,8 @@
             position: absolute;
             top: 0;
             left: 0;
-            height: 24px;
-            width: 24px;
+            height: 20px;
+            width: 20px;
             background-color: #fff;
             border: 2px solid #1768AC;
             border-radius: 4px;
@@ -101,10 +100,10 @@
             content: "";
             position: absolute;
             display: none;
-            left: 7px;
-            top: 3px;
-            width: 6px;
-            height: 12px;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
             border: solid white;
             border-width: 0 3px 3px 0;
             transform: rotate(45deg);
@@ -117,38 +116,31 @@
             font-style: italic;
         }
 
-        .word-input {
+        .input-underline {
             border: none;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
             width: 100%;
-            padding: 4px 2px;
+            padding: 4px 0;
             outline: none;
             background: transparent;
-            display: block;
-            font-size: 13px;
             transition: all 0.2s;
         }
-        .word-input:focus { 
-            border-bottom: 1.5px solid #1768AC; 
-            background-color: #f8fafc; 
+        .input-underline:focus { border-bottom: 1.5px solid #1768AC; background-color: #f8fafc; }
+
+        .word-cell {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
         }
 
-        .mood-btn {
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 2px solid transparent;
-        }
+        .mood-btn { cursor: pointer; transition: all 0.2s; border: 2px solid transparent; width: 33%; }
         .mood-checkbox { display: none; }
         .mood-checkbox:checked + .mood-label {
             border-color: #FF7B54;
             background-color: #fff7ed;
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
-        .stats-card {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            color: white;
-        }
+        .stats-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; }
 
         .modal {
             display: none;
@@ -163,188 +155,134 @@
 </head>
 <body class="p-0 md:p-4">
 
-    <!-- 確認視窗 (Modal) -->
+    <!-- Modal de Confirmation -->
     <div id="confirm-modal" class="modal no-print">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full mx-4">
-            <h3 class="text-xl font-bold text-red-600 mb-4">⚠️ 確認刪除所有紀錄？</h3>
-            <p class="text-slate-600 mb-6 text-sm">此操作將永久清空所有歷史打卡與單詞數據，且無法復原。</p>
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full mx-4 text-center">
+            <h3 class="text-xl font-bold text-red-600 mb-4">⚠️ Confirmer ?</h3>
+            <p class="text-slate-600 mb-6 text-sm">Toutes vos données seront effacées.</p>
             <div class="flex space-x-3">
-                <button onclick="closeModal()" class="flex-1 py-2 bg-slate-100 text-slate-700 rounded-lg font-bold hover:bg-slate-200 transition">取消</button>
-                <button onclick="clearAllRecords()" class="flex-1 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition shadow-lg">確認清空</button>
+                <button onclick="closeModal()" class="flex-1 py-2 bg-slate-100 text-slate-700 rounded-lg font-bold">Annuler</button>
+                <button onclick="clearAllRecords()" class="flex-1 py-2 bg-red-600 text-white rounded-lg font-bold">Confirmer</button>
             </div>
         </div>
     </div>
 
-    <!-- 控制面板 (非列印區域) -->
+    <!-- Toolbar -->
     <div class="no-print max-w-5xl mx-auto mb-6 flex flex-col gap-4">
-        <!-- 統計數據板 -->
         <div class="stats-card p-4 md:p-6 md:rounded-2xl shadow-xl flex justify-around items-center">
             <div class="text-center">
-                <p class="text-gray-400 text-[10px] uppercase tracking-widest mb-1">累積天數</p>
+                <p class="text-gray-400 text-[10px] uppercase tracking-widest mb-1">Total</p>
                 <p id="total-days" class="text-2xl md:text-4xl font-bold text-orange-400">0</p>
             </div>
             <div class="h-10 w-[1px] bg-gray-700"></div>
-            <div class="text-center hidden md:block">
-                <p class="text-gray-400 text-xs uppercase tracking-widest mb-1">最近七天完成度</p>
-                <div class="flex gap-2 mt-2" id="streak-dots">
-                    <!-- 自動生成點點 -->
-                </div>
-            </div>
-            <div class="h-10 w-[1px] bg-gray-700 hidden md:block"></div>
             <div class="text-center">
-                <p class="text-gray-400 text-[10px] uppercase tracking-widest mb-1">選擇日期</p>
+                <p class="text-gray-400 text-[10px] uppercase tracking-widest mb-1">Date</p>
                 <input type="date" id="date-picker" class="bg-transparent border-b border-gray-500 font-bold text-base md:text-lg focus:outline-none cursor-pointer">
             </div>
         </div>
 
-        <div class="bg-white p-4 md:rounded-lg border border-slate-200 flex flex-col md:flex-row justify-between items-center shadow-sm gap-4">
-            <div class="flex-1 text-center md:text-left">
-                <p class="font-bold text-slate-800">數據管理介面 ✏️</p>
-                <p class="text-xs text-slate-500">修改後點擊「保存」即可更新本地存檔。</p>
-            </div>
-            <div class="flex flex-wrap justify-center gap-2">
-                <div id="save-status" class="hidden text-sm bg-green-100 text-green-700 px-3 py-2 rounded-lg items-center border border-green-200 animate-bounce">
-                    ✅ 操作成功
-                </div>
-                <button id="save-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 transition shadow-md text-sm">
-                    💾 保存
-                </button>
-                <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded-lg font-bold hover:bg-slate-900 transition shadow-md text-sm">
-                    🖨️ 列印
-                </button>
-                <button onclick="openModal()" class="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg font-bold hover:bg-red-100 transition text-sm">
-                    🗑️ 清空
-                </button>
-            </div>
+        <div class="bg-white p-4 md:rounded-lg border border-slate-200 flex flex-wrap justify-center gap-2 shadow-sm">
+            <div id="save-status" class="hidden text-sm bg-green-100 text-green-700 px-3 py-2 rounded-lg items-center border border-green-200">✅ OK</div>
+            <button id="save-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 transition text-sm">💾 Sauvegarder</button>
+            <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded-lg font-bold hover:bg-slate-900 transition text-sm">🖨️ Imprimer</button>
+            <button onclick="openModal()" class="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg font-bold text-sm">🗑️ Effacer</button>
         </div>
     </div>
 
-    <!-- A4 容器 -->
+    <!-- Page Content -->
     <div class="page-container" id="printable-area">
-        <!-- 頁首 -->
-        <div class="flex justify-between items-end mb-8">
+        <div class="flex justify-between items-end mb-6">
             <div>
-                <h1 class="header-title text-3xl md:text-4xl uppercase tracking-tighter">Mon Défi</h1>
-                <p class="font-bold tracking-widest mt-1 text-indigo-800 text-xs md:text-base">法語每日單詞打卡表</p>
+                <h1 class="header-title text-3xl uppercase tracking-tighter">Mon Défi</h1>
+                <p class="font-bold tracking-widest mt-1 text-indigo-800 text-[10px] uppercase">Vocabulaire Quotidien</p>
             </div>
-            <div class="text-right w-32 md:w-48 border-b-2 border-indigo-900 pb-1">
+            <div class="text-right border-b-2 border-indigo-900 pb-1">
                 <div class="flex justify-end items-center">
-                    <span class="text-[10px] md:text-sm text-gray-400 font-bold mr-2">DATE:</span>
-                    <span id="display-date" class="text-base md:text-xl font-bold text-indigo-900">2024-03-09</span>
+                    <span class="text-[9px] text-gray-400 font-bold mr-2 uppercase">Date:</span>
+                    <span id="display-date" class="text-lg font-bold text-indigo-900">2024-03-09</span>
                 </div>
             </div>
         </div>
 
-        <!-- 每日金句 -->
-        <div class="french-quote mb-6 md:mb-8">
-            <p class="text-lg md:text-xl text-slate-800 italic">"Petit à petit, l'oiseau fait son nid."</p>
-            <p class="text-xs md:text-sm text-slate-500">滴水穿石，凡事貴在堅持。</p>
+        <div class="french-quote mb-6">
+            <p class="text-lg text-slate-800 italic">"Petit à petit, l'oiseau fait son nid."</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 flex-grow">
-            <!-- 左側：單詞區 -->
-            <div class="space-y-6">
-                <section>
-                    <div class="flex justify-between items-center mb-4 bg-slate-100 p-2 border-l-4 border-indigo-800">
-                        <h2 class="text-lg font-bold">✍️ 單詞 (Mots)</h2>
-                        <button onclick="resetDailyForm()" class="no-print text-[10px] text-gray-400 hover:text-red-500 flex items-center">
-                            重置此頁 ↺
-                        </button>
-                    </div>
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="text-[10px] text-gray-400 uppercase">
-                                <th class="pb-2 w-2/5">單詞與發音</th>
-                                <th class="pb-2 w-3/5">定義與例句</th>
-                            </tr>
-                        </thead>
-                        <tbody id="words-table-body" class="text-sm">
-                            <!-- 由 JS 生成 10 行 -->
-                        </tbody>
-                    </table>
-                </section>
+        <div class="flex flex-col md:flex-row gap-8 flex-grow overflow-hidden">
+            <!-- Words List -->
+            <div class="w-full md:w-[58%] flex flex-col overflow-hidden">
+                <div class="flex justify-between items-center mb-3 bg-slate-100 p-2 border-l-4 border-indigo-800">
+                    <h2 class="text-xs font-bold uppercase tracking-wider">✍️ Mots & Exemples</h2>
+                    <button onclick="resetDailyForm()" class="no-print text-[10px] text-gray-400 hover:text-red-500">Reset ↺</button>
+                </div>
+                
+                <div id="words-container" class="space-y-3 overflow-y-auto pr-1">
+                    <!-- JS rows generated here -->
+                </div>
             </div>
 
-            <!-- 右側：任務區 -->
-            <div class="space-y-8">
+            <!-- Sidebar -->
+            <div class="w-full md:w-[42%] flex flex-col space-y-5">
                 <section>
-                    <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4">✅ 今日任務</h2>
-                    <div id="checklist-container" class="space-y-3 pt-1">
-                        <label class="cb-container">
-                            <span class="text-gray-700 text-sm">聽力練習 (15 分鐘)</span>
-                            <input type="checkbox" data-task="listening">
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="cb-container">
-                            <span class="text-gray-700 text-sm">單詞背誦 (10 個)</span>
-                            <input type="checkbox" data-task="vocab">
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="cb-container">
-                            <span class="text-gray-700 text-sm">朗讀練習 (5 遍)</span>
-                            <input type="checkbox" data-task="reading">
-                            <span class="checkmark"></span>
-                        </label>
-                        <label class="cb-container">
-                            <span class="text-gray-700 text-sm">課後複習與總結</span>
-                            <input type="checkbox" data-task="review">
-                            <span class="checkmark"></span>
-                        </label>
+                    <h2 class="text-xs font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-3 uppercase">✅ Checklist</h2>
+                    <div class="space-y-1.5 pt-1">
+                        <label class="cb-container"><span class="text-gray-700 text-[11px]">Écoute (15 min)</span><input type="checkbox" data-task="listening"><span class="checkmark"></span></label>
+                        <label class="cb-container"><span class="text-gray-700 text-[11px]">Vocabulaire (10 mots)</span><input type="checkbox" data-task="vocab"><span class="checkmark"></span></label>
+                        <label class="cb-container"><span class="text-gray-700 text-[11px]">Lecture à haute voix</span><input type="checkbox" data-task="reading"><span class="checkmark"></span></label>
+                        <label class="cb-container"><span class="text-gray-700 text-[11px]">Révision & Résumé</span><input type="checkbox" data-task="review"><span class="checkmark"></span></label>
                     </div>
                 </section>
 
-                <section>
-                    <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4">📖 語法筆記</h2>
-                    <textarea id="grammar-notes" class="w-full h-32 md:h-44 border border-dashed border-gray-300 rounded p-4 text-sm focus:outline-none focus:border-indigo-500 transition" placeholder="在此輸入今日學到的新句型..."></textarea>
+                <section class="flex flex-col flex-grow">
+                    <h2 class="text-xs font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-3 uppercase">📖 Grammaire</h2>
+                    <textarea id="grammar-notes" class="w-full flex-grow min-h-[350px] md:min-h-[420px] border border-dashed border-gray-300 rounded p-4 text-[11px] leading-relaxed focus:outline-none focus:border-indigo-500 transition-all" placeholder="Écrivez vos notes de grammaire ici..."></textarea>
                 </section>
 
-                <section>
-                    <h2 class="text-lg font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-4">🌟 心情</h2>
-                    <div id="mood-selector" class="flex justify-around py-2">
+                <section class="mb-4">
+                    <h2 class="text-xs font-bold bg-slate-100 p-2 border-l-4 border-indigo-800 mb-3 uppercase">🌟 Humeur</h2>
+                    <div id="mood-selector" class="flex justify-between gap-2">
                         <label class="text-center mood-btn">
                             <input type="radio" name="mood" value="happy" class="mood-checkbox">
-                            <div class="mood-label w-10 h-10 md:w-12 md:h-12 border-2 border-gray-100 rounded-full flex items-center justify-center text-xl md:text-2xl mb-1">😊</div>
-                            <span class="text-[9px]">Satisfait</span>
+                            <div class="mood-label py-2 border-2 border-gray-100 rounded-lg flex flex-col items-center justify-center transition-all">
+                                <span class="text-xl mb-1">😊</span>
+                                <span class="text-[9px] font-bold text-gray-400 uppercase">Content</span>
+                            </div>
                         </label>
                         <label class="text-center mood-btn">
                             <input type="radio" name="mood" value="normal" class="mood-checkbox">
-                            <div class="mood-label w-10 h-10 md:w-12 md:h-12 border-2 border-gray-100 rounded-full flex items-center justify-center text-xl md:text-2xl mb-1">😐</div>
-                            <span class="text-[9px]">Normal</span>
+                            <div class="mood-label py-2 border-2 border-gray-100 rounded-lg flex flex-col items-center justify-center transition-all">
+                                <span class="text-xl mb-1">😐</span>
+                                <span class="text-[9px] font-bold text-gray-400 uppercase">Neutre</span>
+                            </div>
                         </label>
                         <label class="text-center mood-btn">
                             <input type="radio" name="mood" value="sad" class="mood-checkbox">
-                            <div class="mood-label w-10 h-10 md:w-12 md:h-12 border-2 border-gray-100 rounded-full flex items-center justify-center text-xl md:text-2xl mb-1">😫</div>
-                            <span class="text-[9px]">Difficile</span>
+                            <div class="mood-label py-2 border-2 border-gray-100 rounded-lg flex flex-col items-center justify-center transition-all">
+                                <span class="text-xl mb-1">😫</span>
+                                <span class="text-[9px] font-bold text-gray-400 uppercase">Épuisé</span>
+                            </div>
                         </label>
                     </div>
                 </section>
             </div>
         </div>
 
-        <div class="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center text-[10px] text-gray-400">
-            <p>© 2024 Mon Défi Quotidien</p>
-            <div class="flex space-x-2">
-                <div class="w-3 h-3 bg-indigo-900"></div>
-                <div class="w-3 h-3 bg-indigo-600"></div>
-                <div class="w-3 h-3 bg-orange-400"></div>
+        <div class="mt-2 pt-3 border-t border-gray-100 flex justify-between items-center text-[8px] text-gray-400">
+            <p>Mon Défi Quotidien • Apprendre le Français</p>
+            <div class="flex space-x-1">
+                <div class="w-2 h-2 bg-indigo-900"></div><div class="w-2 h-2 bg-indigo-600"></div><div class="w-2 h-2 bg-orange-400"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // 生成單詞輸入行
-        const tableBody = document.getElementById('words-table-body');
+        const container = document.getElementById('words-container');
         for(let i=1; i<=10; i++) {
-            tableBody.innerHTML += `
-                <tr>
-                    <td class="py-2 pr-2 border-b border-gray-100 align-top">
-                        <input type="text" class="word-input font-bold text-indigo-900" placeholder="${i}. 單詞" id="word-${i}">
-                        <input type="text" class="word-input text-[10px] text-gray-400 italic" placeholder="/發音/" id="pron-${i}">
-                    </td>
-                    <td class="py-2 border-b border-gray-100 align-top">
-                        <textarea class="word-input text-[10px] w-full h-10 overflow-hidden py-1 leading-tight" placeholder="例句..." id="def-${i}"></textarea>
-                    </td>
-                </tr>
+            container.innerHTML += `
+                <div class="word-cell">
+                    <input type="text" class="input-underline font-bold text-indigo-900 text-sm mb-1" placeholder="${i}. Mot" id="word-${i}">
+                    <textarea class="input-underline text-[10px] w-full h-10 resize-none leading-relaxed" placeholder="Définition et exemple détaillé..." id="def-${i}"></textarea>
+                </div>
             `;
         }
 
@@ -359,8 +297,7 @@
         function saveToLocal() {
             const records = getAllRecords();
             const currentData = {
-                words: {},
-                checklist: {},
+                words: {}, checklist: {},
                 notes: document.getElementById('grammar-notes').value,
                 mood: document.querySelector('input[name="mood"]:checked')?.value || null,
                 lastUpdated: new Date().getTime()
@@ -369,7 +306,6 @@
             for(let i=1; i<=10; i++) {
                 currentData.words[i] = {
                     w: document.getElementById(`word-${i}`).value,
-                    p: document.getElementById(`pron-${i}`).value,
                     d: document.getElementById(`def-${i}`).value
                 };
             }
@@ -380,7 +316,6 @@
 
             records[selectedDate] = currentData;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-            
             showSaveFeedback();
             updateStats();
         }
@@ -397,7 +332,6 @@
             document.querySelectorAll('input[name="mood"]').forEach(rb => rb.checked = false);
             for(let i=1; i<=10; i++) {
                 document.getElementById(`word-${i}`).value = data?.words?.[i]?.w || '';
-                document.getElementById(`pron-${i}`).value = data?.words?.[i]?.p || '';
                 document.getElementById(`def-${i}`).value = data?.words?.[i]?.d || '';
             }
             if (data?.checklist) {
@@ -413,52 +347,28 @@
         }
 
         function resetDailyForm() {
-            if(confirm("確定要清空當前頁面的填寫內容嗎？（不會刪除已保存的歷史紀錄）")) {
-                applyDataToUI(null);
-            }
+            if(confirm("Effacer les entrées ?")) applyDataToUI(null);
         }
 
-        function openModal() {
-            document.getElementById('confirm-modal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('confirm-modal').style.display = 'none';
-        }
+        function openModal() { document.getElementById('confirm-modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('confirm-modal').style.display = 'none'; }
 
         function clearAllRecords() {
             localStorage.removeItem(STORAGE_KEY);
             closeModal();
             loadFromLocal(selectedDate);
             updateStats();
-            showSaveFeedback();
         }
 
         function updateStats() {
             const records = getAllRecords();
-            const dates = Object.keys(records);
-            document.getElementById('total-days').innerText = dates.length;
-
-            const streakContainer = document.getElementById('streak-dots');
-            if (streakContainer) {
-                streakContainer.innerHTML = '';
-                for (let i = 6; i >= 0; i--) {
-                    const d = new Date();
-                    d.setDate(d.getDate() - i);
-                    const ds = d.toISOString().split('T')[0];
-                    const dot = document.createElement('div');
-                    const hasData = records[ds];
-                    dot.className = `w-3 h-3 rounded-full ${hasData ? 'bg-orange-400' : 'bg-gray-700'} transition-all`;
-                    dot.title = ds;
-                    streakContainer.appendChild(dot);
-                }
-            }
+            document.getElementById('total-days').innerText = Object.keys(records).length;
         }
 
         function showSaveFeedback() {
             const status = document.getElementById('save-status');
             status.classList.remove('hidden');
-            setTimeout(() => status.classList.add('hidden'), 3000);
+            setTimeout(() => status.classList.add('hidden'), 2000);
         }
 
         document.getElementById('date-picker').addEventListener('change', (e) => {
